@@ -116,17 +116,34 @@
             margin-bottom: 24px;
         }
 
-        .eyebrow {
-            display: inline-block;
-            font-size: 0.65rem;
+        /* ROADMAP BREADCRUMBS */
+        .roadmap {
+            font-size: 0.6rem;
             font-weight: 800;
-            letter-spacing: 0.18em;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
-            margin-bottom: 6px;
-            color: var(--neon-orange);
+            margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .roadmap span {
+            opacity: 0.4;
+        }
+
+        .roadmap span.active {
+            opacity: 1;
+            color: var(--neon-yellow);
             background: var(--text-main);
-            padding: 4px 8px;
+            padding: 3px 6px;
             border-radius: 6px;
+        }
+
+        .roadmap-arrow {
+            opacity: 0.3 !important;
+            font-weight: 900;
         }
 
         .slide-header h1 {
@@ -302,8 +319,14 @@
 
         <div class="slide active">
             <div class="slide-header">
-                <div class="eyebrow">Burlington, Vermont</div>
+                <div class="roadmap">
+                    <span class="active">The League</span> <span class="roadmap-arrow">&rarr;</span> 
+                    <span>The Vibe</span> <span class="roadmap-arrow">&rarr;</span> 
+                    <span>Teams & Signup</span> <span class="roadmap-arrow">&rarr;</span> 
+                    <span>Rules</span>
+                </div>
                 <h1>Btown Basketball League</h1>
+                <p>Burlington's $20 Wednesday night run.</p>
             </div>
             
             <div class="bento-grid">
@@ -333,6 +356,12 @@
 
         <div class="slide">
             <div class="slide-header">
+                <div class="roadmap">
+                    <span>The League</span> <span class="roadmap-arrow">&rarr;</span> 
+                    <span class="active">The Vibe</span> <span class="roadmap-arrow">&rarr;</span> 
+                    <span>Teams & Signup</span> <span class="roadmap-arrow">&rarr;</span> 
+                    <span>Rules</span>
+                </div>
                 <h1>THE VIBE</h1>
                 <p>More than just one weekly game.</p>
             </div>
@@ -364,6 +393,12 @@
 
         <div class="slide">
             <div class="slide-header">
+                <div class="roadmap">
+                    <span>The League</span> <span class="roadmap-arrow">&rarr;</span> 
+                    <span>The Vibe</span> <span class="roadmap-arrow">&rarr;</span> 
+                    <span class="active">Teams & Signup</span> <span class="roadmap-arrow">&rarr;</span> 
+                    <span>Rules</span>
+                </div>
                 <h1>TEAMS & SIGNUP</h1>
                 <p>Secure your spot or just hang out.</p>
             </div>
@@ -407,6 +442,12 @@
 
         <div class="slide">
             <div class="slide-header">
+                <div class="roadmap">
+                    <span>The League</span> <span class="roadmap-arrow">&rarr;</span> 
+                    <span>The Vibe</span> <span class="roadmap-arrow">&rarr;</span> 
+                    <span>Teams & Signup</span> <span class="roadmap-arrow">&rarr;</span> 
+                    <span class="active">Rules</span>
+                </div>
                 <h1>THE RULES</h1>
                 <p>Keep it moving, keep it clean.</p>
             </div>
