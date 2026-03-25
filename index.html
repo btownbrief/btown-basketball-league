@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Btown Basketball League</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+
+        :root {
+            --bg-color: #f4f0ea;       
+            --text-main: #111111;      
+            --border-color: #111111;
+            --card-white: #ffffff;     
+
+            --neon-pink:   #ff85a2;
+            --neon-green:  #00e676;
+            --neon-purple: #b185ff;
+            --neon-yellow: #ffde59;
+            --neon-blue:   #4dd0e1;
+            --neon-orange: #ff9e5e;
+
+            --bg-dark: #111111;  
+
+            --dot-daily:  #e63030;   
+            --dot-weekly: #2563eb;   
+            --dot-btown:  #f5c800;   
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #111111; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100dvh;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 480px;
+            height: 100%;
+            background: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* UTILITY CLASSES */
+        .bg-pink   { background-color: var(--neon-pink); }
+        .bg-green  { background-color: var(--neon-green); }
+        .bg-purple { background-color: var(--neon-purple); }
+        .bg-yellow { background-color: var(--neon-yellow); }
+        .bg-blue   { background-color: var(--neon-blue); }
+        .bg-orange { background-color: var(--neon-orange); }
+        .bg-dark   { background-color: var(--bg-dark); color: #f4f0ea; }
+
+        h1, h2, h3, p { margin: 0; }
+
+        /* PROGRESS BAR & META BAR */
+        #progress-container {
+            display: flex;
+            gap: 4px;
+            padding: 16px 20px 10px;
+        }
+
+        .progress-bar-wrapper {
+            flex: 1;
+            height: 4px;
+            background: rgba(17,17,17,0.15);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--text-main);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .meta-bar {
+            padding: 0 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border-bottom: 3px solid var(--border-color);
+            z-index: 10;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.67rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .leg-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(0,0,0,0.15);
+        }
+        .leg-dot.daily { background: var(--dot-daily); }
+        .leg-dot.weekly { background: var(--dot-weekly); }
+        .leg-dot.btown { background: var(--dot-btown); border-color: rgba(0,0,0,0.25); }
+        .leg-dot.needed { background: rgba(17,17,17,0.2); }
+
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+        .filter-bar::-webkit-scrollbar { display: none; }
+
+        .filter-btn {
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: 99px;
+            padding: 6px 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.67rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: 2px 2px 0px rgba(17,17,17,1);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .filter-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: none;
+        }
+
+        .filter-btn.active {
+            background: var(--text-main);
+            color: var(--card-white);
+            box-shadow: 2px 2px 0px rgba(17,17,17,0.3);
+        }
+
+        /* SLIDES */
+        .slides-container {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            pointer-events: none;
+            overflow-y: auto;
+            padding: 24px 20px 100px;
+            transition: opacity 0.15s ease-in-out;
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .slide-header {
+            margin-bottom: 24px;
+        }
+
+        .slide-header h1 {
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            text-transform: uppercase;
+            line-height: 0.95;
+            margin-bottom: 6px;
+        }
+
+        .slide-header p {
+            font-size: 0.9rem;
+            font-weight: 600;
+            opacity: 0.78;
+        }
+
+        /* CARDS */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding-bottom: 24px;
+        }
+
+        .card {
+            background-color: var(--card-white);
+            border: 3px solid var(--border-color);
+            border-radius: 18px;
+            padding: 13px;
+            text-decoration: none;
+            color: var(--text-main);
+            box-shadow: 4px 4px 0px rgba(17,17,17,1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 116px;
+            position: relative;
+            transition: transform 0.1s, box-shadow 0.1s, opacity 0.2s;
+        }
+
+        .card:active {
+            transform: translate(3px, 3px);
+            box-shadow: 1px 1px 0px rgba(17,17,17,1);
+        }
+
+        .card .emoji {
+            font-size: 1.75rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .card h3 {
+            font-size: 1.02rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 3px;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+        }
+
+        .card p {
+            font-size: 0.76rem;
+            font-weight: 600;
+            opacity: 0.78;
+            line-height: 1.35;
+        }
+
+        .card.span-2 {
+            grid-column: span 2;
+            min-height: 98px;
+            flex-direction: row;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .card.span-2 .emoji {
+            font-size: 2.1rem;
+            margin-bottom: 0;
+            flex-shrink: 0;
+        }
+
+        .card.span-2 .card-content {
+            flex: 1;
+        }
+
+        /* DOT SYSTEM */
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 9px; right: 9px;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(0,0,0,0.15);
+        }
+        .card[data-freq="daily"]::after    { background: var(--dot-daily); }
+        .card[data-freq="weekly"]::after   { background: var(--dot-weekly); }
+        .card[data-freq="asneeded"]::after { background: rgba(17,17,17,0.2); }
+        .card[data-owner="btown"]::after   { background: var(--dot-btown); border-color: rgba(0,0,0,0.25); }
+        
+        .bg-dark.card::after { border-color: rgba(255,255,255,0.3); }
+
+        .filter-hidden {
+            opacity: 0.1 !important;
+            pointer-events: none;
+        }
+
+        /* PILLS */
+        .pill-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding-bottom: 40px;
+        }
+
+        .pill {
+            background-color: var(--card-white);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: var(--text-main);
+            box-shadow: 2px 2px 0px rgba(17,17,17,1);
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .pill:active { 
+            transform: translate(2px, 2px); 
+            box-shadow: none; 
+        }
+
+        .pill-handle { 
+            font-size: 0.8rem; 
+            font-weight: 800; 
+            text-transform: uppercase;
+        }
+
+        .pill-desc { 
+            font-size: 0.66rem; 
+            font-weight: 600; 
+            opacity: 0.78; 
+        }
+
+        /* NAVIGATION ARROWS */
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 56px; height: 56px;
+            background: rgba(17,17,17,0.42);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.22);
+            border-radius: 50%;
+            color: white;
+            font-size: 26px;
+            font-weight: 800;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 150;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .nav-arrow.left  { left: 8px; }
+        .nav-arrow.right { right: 8px; }
+        .nav-arrow.disabled { opacity: 0; pointer-events: none; }
+
+        .tap-hint {
+            position: absolute;
+            bottom: 16px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    
+    <div id="progress-container"></div>
+
+    <div class="meta-bar">
+        <div class="legend">
+            <span class="legend-item"><span class="leg-dot daily"></span>Daily</span>
+            <span class="legend-item"><span class="leg-dot weekly"></span>Weekly</span>
+            <span class="legend-item"><span class="leg-dot btown"></span>Btown Made</span>
+            <span class="legend-item"><span class="leg-dot needed"></span>As Needed</span>
+        </div>
+        <div class="filter-bar">
+            <button class="filter-btn active" data-f="all">All</button>
+            <button class="filter-btn" data-f="daily">Daily</button>
+            <button class="filter-btn" data-f="weekly">Weekly</button>
+            <button class="filter-btn" data-f="btown">Btown ★</button>
+        </div>
+    </div>
+
+    <div class="slides-container">
+        
+        <div class="nav-arrow left" id="prevArrow">&#8249;</div>
+        <div class="nav-arrow right" id="nextArrow">&#8250;</div>
+
+        <div class="slide active">
+            <div class="slide-header">
+                <h1>THE LEAGUE</h1>
+                <p>Burlington's $20 Wednesday night run.</p>
+            </div>
+            
+            <div class="bento-grid">
+                <a href="https://forms.gle/C7VXoCeqsN3d8ebLA" target="_blank" class="card span-2 bg-yellow" data-owner="btown">
+                    <span class="emoji">📝</span>
+                    <div class="card-content">
+                        <h3>Join The League</h3>
+                        <p>Fill out the player form to secure your spot.</p>
+                    </div>
+                </a>
+
+                <div class="card bg-blue" data-freq="asneeded">
+                    <span class="emoji">💸</span>
+                    <h3>$20 Entry</h3>
+                    <p>Covers the 6-week session & indoor rain backups.</p>
+                </div>
+
+                <div class="card bg-pink" data-freq="weekly">
+                    <span class="emoji">📅</span>
+                    <h3>April 22nd</h3>
+                    <p>Wednesday nights. Thursday rain backup.</p>
+                </div>
+
+                <div class="card bg-green" data-freq="asneeded">
+                    <span class="emoji">⚖️</span>
+                    <h3>Self-Rated</h3>
+                    <p>Rate your skill 1-10 for balanced team creation.</p>
+                </div>
+
+                <div class="card bg-orange" data-freq="weekly">
+                    <span class="emoji">🏀</span>
+                    <h3>7-Player Max</h3>
+                    <p>Small rosters mean more run, less sitting.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">
+                <h1>THE VIBE</h1>
+                <p>More than just a weekly game.</p>
+            </div>
+            
+            <div class="bento-grid">
+                <a href="https://t.me/+Akss4_f1AOQ5NmYx" target="_blank" class="card span-2 bg-purple" data-freq="daily">
+                    <span class="emoji">💬</span>
+                    <div class="card-content">
+                        <h3>Pickup Groupchat</h3>
+                        <p>Find casual runs across the city all week long.</p>
+                    </div>
+                </a>
+
+                <div class="card bg-pink" data-freq="asneeded">
+                    <span class="emoji">🍕</span>
+                    <h3>The Prize</h3>
+                    <p>Winning team gets a pizza party & free tees.</p>
+                </div>
+
+                <div class="card bg-blue" data-freq="weekly">
+                    <span class="emoji">🍻</span>
+                    <h3>Hang Out</h3>
+                    <p>Bring food, friends, and family to the sidelines.</p>
+                </div>
+
+                <a href="https://btownbrief.com" target="_blank" class="card span-2 bg-dark" data-owner="btown">
+                    <span class="emoji">📰</span>
+                    <div class="card-content">
+                        <h3>Btown Brief</h3>
+                        <p>The Burlington newsletter that runs this league.</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">
+                <h1>THE RULES</h1>
+                <p>Keep it moving, keep it clean.</p>
+            </div>
+            
+            <div class="bento-grid">
+                <div class="card span-2 bg-dark" data-freq="asneeded">
+                    <span class="emoji">📋</span>
+                    <div class="card-content">
+                        <h3>How We Play</h3>
+                        <p>Serious pickup for players who know how to hoop.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pill-grid">
+                <div class="pill">
+                    <span class="pill-handle">Schedule</span>
+                    <span class="pill-desc">4-wk regular, 2-wk playoffs</span>
+                </div>
+                <div class="pill">
+                    <span class="pill-handle">Format</span>
+                    <span class="pill-desc">Full-court 5v5</span>
+                </div>
+                <div class="pill">
+                    <span class="pill-handle">Clock</span>
+                    <span class="pill-desc">Stops under 4 minutes</span>
+                </div>
+                <div class="pill">
+                    <span class="pill-handle">Fouls</span>
+                    <span class="pill-desc">Offense calls it</span>
+                </div>
+                <div class="pill">
+                    <span class="pill-handle">Free Throws</span>
+                    <span class="pill-desc">One shot per shooting foul</span>
+                </div>
+                <div class="pill">
+                    <span class="pill-handle">Contests</span>
+                    <span class="pill-desc">Shoot for it to resolve</span>
+                </div>
+                <div class="pill">
+                    <span class="pill-handle">Subs</span>
+                    <span class="pill-desc">Everyone sits once before twice</span>
+                </div>
+                <div class="pill">
+                    <span class="pill-handle">Timekeeping</span>
+                    <span class="pill-desc">Sub helps keep time</span>
+                </div>
+                <div class="pill">
+                    <span class="pill-handle">Conduct</span>
+                    <span class="pill-desc">Absolutely no rough fouls</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="tap-hint">Tap edges or swipe to navigate</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    let activeFilter = 'all';
+
+    // Generate progress bars dynamically
+    const progressContainer = document.getElementById('progress-container');
+    for (let i = 0; i < totalSlides; i++) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'progress-bar-wrapper';
+        const fill = document.createElement('div');
+        fill.className = 'progress-bar-fill';
+        wrapper.appendChild(fill);
+        progressContainer.appendChild(wrapper);
+    }
+    const progressBars = document.querySelectorAll('.progress-bar-wrapper');
+    const prevArrow = document.getElementById('prevArrow');
+    const nextArrow = document.getElementById('nextArrow');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+
+    function applyFilter() {
+        document.querySelectorAll('.card').forEach(card => {
+            let show = false;
+            if (activeFilter === 'all') show = true;
+            else if (activeFilter === 'btown') show = card.dataset.owner === 'btown';
+            else show = card.dataset.freq === activeFilter;
+            card.classList.toggle('filter-hidden', !show);
+        });
+    }
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', e => {
+            e.stopPropagation();
+            activeFilter = btn.dataset.f;
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            applyFilter();
+        });
+    });
+
+    function goTo(index) {
+        if (index < 0 || index >= totalSlides) return;
+        currentSlide = index;
+        updateUI();
+    }
+
+    function updateUI() {
+        slides.forEach((slide, i) => slide.classList.toggle('active', i === currentSlide));
+        progressBars.forEach((bar, i) => {
+            bar.classList.toggle('completed', i < currentSlide);
+            bar.querySelector('.progress-bar-fill').style.width = i <= currentSlide ? '100%' : '0%';
+        });
+        prevArrow.classList.toggle('disabled', currentSlide === 0);
+        nextArrow.classList.toggle('disabled', currentSlide === totalSlides - 1);
+    }
+
+    prevArrow.addEventListener('click', () => goTo(currentSlide - 1));
+    nextArrow.addEventListener('click', () => goTo(currentSlide + 1));
+
+    const appContainer = document.getElementById('app-container');
+    appContainer.addEventListener('click', e => {
+        if (e.target.closest('a') || e.target.closest('.nav-arrow') || e.target.closest('.filter-btn')) return;
+        const rect = appContainer.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        if (x < rect.width * 0.3) goTo(currentSlide - 1);
+        else if (x > rect.width * 0.7) goTo(currentSlide + 1);
+    });
+
+    let startX = 0, startY = 0;
+    appContainer.addEventListener('touchstart', e => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+    }, { passive: true });
+    appContainer.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].clientX - startX;
+        const dy = e.changedTouches[0].clientY - startY;
+        if (Math.abs(dx) > 50 && Math.abs(dy) < Math.abs(dx)) {
+            dx > 0 ? goTo(currentSlide - 1) : goTo(currentSlide + 1);
+        }
+    }, { passive: true });
+
+    updateUI();
+});
+</script>
+
+</body>
+</html>
